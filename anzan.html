@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+</head>
+<link rel="stylesheet" href="./jukain.css">
+<body>
+  <h1>暗算ゲーム</h1>
+
+  <!-- ゲーム画面 -->
+  <div id="game-screen">
+    <p id="question"></p>
+    <button id="change">ショップ</button>
+    <input type="number" id="answer" placeholder="答えを入力">
+    <button onclick="checkAnswer()">回答</button>
+    <p id="result"></p>
+  </div>
+
+  <!-- ショップ画面（最初は非表示） -->
+  <div id="shop-screen" style="display:none;">
+    <h2>ショップ</h2>
+    <p>ここでアイテムを買えるよ！</p>
+    <button id="kotae">２コイン追加ボックス・・・7コイン</button>
+    <div id="kazu">コイン数・・0枚</div>
+
+    <button id="back">ゲームに戻る</button>
+  </div>
+
+  <script>
+  let a, b;
+  let coin = 0; // ← これが重要！
+
+  function newQuestion() {
+    a = Math.floor(Math.random() * 25) + 1;
+    b = Math.floor(Math.random() * 25) + 1;
+    document.getElementById("question").textContent = `${a} x ${b} = ?`;
+    document.getElementById("answer").value = "";
+    document.getElementById("result").textContent = "";
+  }
+
+  function checkAnswer() {
+    const ans = parseInt(document.getElementById("answer").value);
+    if (ans === a * b) {
+      document.getElementById("result").textContent = "正解！";
+      coin += 1; // コインを増やす
+      updateCoin();
+    } else {
+      document.getElementById("result").textContent = "残念！正解は " + (a * b);
+    }
+    setTimeout(newQuestion, 1500);
+  }
+
+  newQuestion();
+
+  /* -------------------------
+     コイン表示更新
+  -------------------------- */
+  function updateCoin() {
+    document.getElementById("kazu").textContent = `コイン数・・${coin}枚`;
+  }
+
+  /* -------------------------
+     ショップ切り替え
+  -------------------------- */
+  const gameScreen = document.getElementById("game-screen");
+  const shopScreen = document.getElementById("shop-screen");
+
+  document.getElementById("change").addEventListener("click", () => {
+    gameScreen.style.display = "none";
+    shopScreen.style.display = "block";
+    updateCoin();
+  });
+
+  document.getElementById("back").addEventListener("click", () => {
+    shopScreen.style.display = "none";
+    gameScreen.style.display = "block";
+  });
+
+  /* -------------------------
+     アイテム購入
+  -------------------------- */
+  document.getElementById("kotae").addEventListener("click", () => {
+    if (coin >= 7) {
+      coin -= 7;
+      coin += 2; // 2コイン追加
+      updateCoin();
+      alert("2コイン追加したよ！");
+    } else {
+      alert("コインが足りないよ！");
+    }
+  });
+</script>
+
+</body>
+</html>
