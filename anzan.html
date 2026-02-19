@@ -2,94 +2,160 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+
+    .shop-1 {
+      width: 5cm;
+      height: 5cm;
+      background-image: url("./coinbox.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      display: inline-block;
+      position: relative;
+      margin: 10px auto;
+      border: 2px solid #444;
+      border-radius: 10px;
+    }
+
+    .indo {
+      display: none;
+      margin-top: 20px;
+    }
+  </style>
 </head>
-<link rel="stylesheet" href="./jukain.css">
+
 <body>
+
   <h1>暗算ゲーム</h1>
 
-  <!-- ゲーム画面 -->
+  <!-- 通常ゲーム -->
   <div id="game-screen">
     <p id="question"></p>
     <button id="change">ショップ</button>
+    <br><br>
     <input type="number" id="answer" placeholder="答えを入力">
     <button onclick="checkAnswer()">回答</button>
     <p id="result"></p>
+    <button id="india">地獄のインド式掛け算</button>
   </div>
 
-  <!-- ショップ画面（最初は非表示） -->
+  <!-- ショップ -->
   <div id="shop-screen" style="display:none;">
     <h2>ショップ</h2>
     <p>ここでアイテムを買えるよ！</p>
+
+    <div class="shop-1"></div>
+
     <button id="kotae">２コイン追加ボックス・・・7コイン</button>
+
     <div id="kazu">コイン数・・0枚</div>
 
+    <br>
     <button id="back">ゲームに戻る</button>
   </div>
 
+  <!-- インド式 -->
+  <div class="indo" id="indo-screen">
+    <p id="question2"></p>
+    <input type="number" id="answer2" placeholder="答えを入力">
+    <button onclick="checkAnswer2()">回答</button>
+    <p id="result2"></p>
+    <button id="back2">戻る</button>
+  </div>
+
   <script>
-  let a, b;
-  let coin = 0; // ← これが重要！
+    let a, b, c, d;
 
-  function newQuestion() {
-    a = Math.floor(Math.random() * 25) + 1;
-    b = Math.floor(Math.random() * 25) + 1;
-    document.getElementById("question").textContent = `${a} x ${b} = ?`;
-    document.getElementById("answer").value = "";
-    document.getElementById("result").textContent = "";
-  }
+    let coin = Number(localStorage.getItem("coin")) || 0;
 
-  function checkAnswer() {
-    const ans = parseInt(document.getElementById("answer").value);
-    if (ans === a * b) {
-      document.getElementById("result").textContent = "正解！";
-      coin += 1; // コインを増やす
-      updateCoin();
-    } else {
-      document.getElementById("result").textContent = "残念！正解は " + (a * b);
+    function newQuestion() {
+      a = Math.floor(Math.random() * 25) + 1;
+      b = Math.floor(Math.random() * 20) + 1;
+      document.getElementById("question").textContent = `${a} x ${b} = ?`;
+      document.getElementById("answer").value = "";
+      document.getElementById("result").textContent = "";
     }
-    setTimeout(newQuestion, 1500);
-  }
 
-  newQuestion();
+    function newQuestion2() {
+      c = Math.floor(Math.random() * 35) + 7;
+      d = Math.floor(Math.random() * 35) + 7;
+      document.getElementById("question2").textContent = `${c} x ${d} = ?`;
+      document.getElementById("answer2").value = "";
+      document.getElementById("result2").textContent = "";
+    }
 
-  /* -------------------------
-     コイン表示更新
-  -------------------------- */
-  function updateCoin() {
-    document.getElementById("kazu").textContent = `コイン数・・${coin}枚`;
-  }
+    function checkAnswer() {
+      const ans = parseInt(document.getElementById("answer").value);
+      if (ans === a * b) {
+        document.getElementById("result").textContent = "正解！";
+        coin++;
+        updateCoin();
+      } else {
+        document.getElementById("result").textContent = "残念！正解は " + (a * b);
+      }
+      setTimeout(newQuestion, 1500);
+    }
 
-  /* -------------------------
-     ショップ切り替え
-  -------------------------- */
-  const gameScreen = document.getElementById("game-screen");
-  const shopScreen = document.getElementById("shop-screen");
+    function checkAnswer2() {
+      const ans = parseInt(document.getElementById("answer2").value);
+      if (ans === c * d) {
+        document.getElementById("result2").textContent = "正解！";
+        coin++;
+        updateCoin();
+      } else {
+        document.getElementById("result2").textContent = "残念！正解は " + (c * d);
+      }
+      setTimeout(newQuestion2, 1500);
+    }
 
-  document.getElementById("change").addEventListener("click", () => {
-    gameScreen.style.display = "none";
-    shopScreen.style.display = "block";
+    function updateCoin() {
+      document.getElementById("kazu").textContent = `コイン数・・${coin}枚`;
+      localStorage.setItem("coin", coin);
+    }
+
+    newQuestion();
     updateCoin();
-  });
 
-  document.getElementById("back").addEventListener("click", () => {
-    shopScreen.style.display = "none";
-    gameScreen.style.display = "block";
-  });
+    const gameScreen = document.getElementById("game-screen");
+    const shopScreen = document.getElementById("shop-screen");
+    const indoScreen = document.getElementById("indo-screen");
 
-  /* -------------------------
-     アイテム購入
-  -------------------------- */
-  document.getElementById("kotae").addEventListener("click", () => {
-    if (coin >= 7) {
-      coin -= 7;
-      coin += 2; // 2コイン追加
-      updateCoin();
-      alert("2コイン追加したよ！");
-    } else {
-      alert("コインが足りないよ！");
-    }
-  });
-</script>
+    document.getElementById("change").addEventListener("click", () => {
+      gameScreen.style.display = "none";
+      shopScreen.style.display = "block";
+    });
+
+    document.getElementById("back").addEventListener("click", () => {
+      shopScreen.style.display = "none";
+      gameScreen.style.display = "block";
+    });
+
+    document.getElementById("india").addEventListener("click", () => {
+      gameScreen.style.display = "none";
+      indoScreen.style.display = "block";
+      newQuestion2();
+    });
+
+    document.getElementById("back2").addEventListener("click", () => {
+      indoScreen.style.display = "none";
+      gameScreen.style.display = "block";
+    });
+
+    document.getElementById("kotae").addEventListener("click", () => {
+      if (coin >= 7) {
+        coin -= 7;
+        coin += 2;
+        updateCoin();
+        alert("2コイン追加したよ！");
+      } else {
+        alert("コインが足りないよ！");
+      }
+    });
+  </script>
 
 </body>
 </html>
