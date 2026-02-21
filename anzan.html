@@ -15,13 +15,17 @@
       background-size: cover;
       background-repeat: no-repeat;
       display: inline-block;
-      position: relative;
       margin: 10px auto;
       border: 2px solid #444;
       border-radius: 10px;
     }
 
     .indo {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #janken-screen {
       display: none;
       margin-top: 20px;
     }
@@ -41,6 +45,19 @@
     <button onclick="checkAnswer()">回答</button>
     <p id="result"></p>
     <button id="india">地獄のインド式掛け算</button>
+    <p id="mamegame"></p>
+    <a href="./kuku.html">九九表</a>
+  </div>
+
+  <!-- ランダムじゃんけん -->
+  <div id="janken-screen">
+    <h2>突然じゃんけん！</h2>
+    <button class="hand" data-hand="グー">グー</button>
+    <button class="hand" data-hand="チョキ">チョキ</button>
+    <button class="hand" data-hand="パー">パー</button>
+    <p>一回だけ選んでください</p>
+    <p id="janken-result"></p>
+    <button id="janken-back">戻る</button>
   </div>
 
   <!-- ショップ -->
@@ -53,6 +70,7 @@
     <button id="kotae">２コイン追加ボックス・・・7コイン</button>
 
     <div id="kazu">コイン数・・0枚</div>
+    <p id="mame"></p>
 
     <br>
     <button id="back">ゲームに戻る</button>
@@ -65,10 +83,16 @@
     <button onclick="checkAnswer2()">回答</button>
     <p id="result2"></p>
     <button id="back2">戻る</button>
+    
   </div>
 
   <script>
     let a, b, c, d;
+
+    const mame = document.getElementById("mame");
+    const mamegame = document.getElementById("mamegame");
+    mamegame.textContent =
+    mame.textContent = "数学豆知識：円周率は3.14159265358979323846264だよ！";
 
     let coin = Number(localStorage.getItem("coin")) || 0;
 
@@ -81,8 +105,8 @@
     }
 
     function newQuestion2() {
-      c = Math.floor(Math.random() * 35) + 7;
-      d = Math.floor(Math.random() * 35) + 7;
+      c = Math.floor(Math.random() * 35) + 1;
+      d = Math.floor(Math.random() * 35) + 1;
       document.getElementById("question2").textContent = `${c} x ${d} = ?`;
       document.getElementById("answer2").value = "";
       document.getElementById("result2").textContent = "";
@@ -117,13 +141,62 @@
       localStorage.setItem("coin", coin);
     }
 
-    newQuestion();
-    updateCoin();
-
     const gameScreen = document.getElementById("game-screen");
     const shopScreen = document.getElementById("shop-screen");
     const indoScreen = document.getElementById("indo-screen");
+    const jankenScreen = document.getElementById("janken-screen");
 
+    /* ランダムじゃんけん */
+    let jankenTimer = null;
+
+    function startRandomJanken() {
+      if (jankenTimer !== null) {
+        clearTimeout(jankenTimer);
+      }
+
+      let time = Math.random() * 9000 + 4000; // 4〜13秒
+
+      jankenTimer = setTimeout(() => {
+        gameScreen.style.display = "none";
+        jankenScreen.style.display = "block";
+      }, time);
+    }
+
+    /* じゃんけん処理 */
+    const hands = ["グー", "チョキ", "パー"];
+
+    document.querySelectorAll(".hand").forEach(btn => {
+      btn.addEventListener("click", () => {
+        let player = btn.dataset.hand;
+        let cpu = hands[Math.floor(Math.random() * 3)];
+
+        let result = "";
+        if (player === cpu) {
+          result = "あいこ！";
+        } else if (
+          (player === "グー" && cpu === "チョキ") ||
+          (player === "チョキ" && cpu === "パー") ||
+          (player === "パー" && cpu === "グー")
+        ) {
+          result = "勝ち！ コイン+1";
+          coin++;
+          updateCoin();
+        } else {
+          result = "負け…";
+        }
+
+        document.getElementById("janken-result").textContent =
+          `あなた：${player}　CPU：${cpu} → ${result}`;
+      });
+    });
+
+    document.getElementById("janken-back").addEventListener("click", () => {
+      jankenScreen.style.display = "none";
+      gameScreen.style.display = "block";
+      startRandomJanken();
+    });
+
+    /* ショップ */
     document.getElementById("change").addEventListener("click", () => {
       gameScreen.style.display = "none";
       shopScreen.style.display = "block";
@@ -131,17 +204,6 @@
 
     document.getElementById("back").addEventListener("click", () => {
       shopScreen.style.display = "none";
-      gameScreen.style.display = "block";
-    });
-
-    document.getElementById("india").addEventListener("click", () => {
-      gameScreen.style.display = "none";
-      indoScreen.style.display = "block";
-      newQuestion2();
-    });
-
-    document.getElementById("back2").addEventListener("click", () => {
-      indoScreen.style.display = "none";
       gameScreen.style.display = "block";
     });
 
@@ -155,6 +217,23 @@
         alert("コインが足りないよ！");
       }
     });
+
+    /* インド式 */
+    document.getElementById("india").addEventListener("click", () => {
+      gameScreen.style.display = "none";
+      indoScreen.style.display = "block";
+      newQuestion2();
+    });
+
+    document.getElementById("back2").addEventListener("click", () => {
+      indoScreen.style.display = "none";
+      gameScreen.style.display = "block";
+    });
+
+    /* ゲーム開始 */
+    newQuestion();
+    updateCoin();
+    startRandomJanken();
   </script>
 
 </body>

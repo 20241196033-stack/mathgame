@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>九九表</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    td {
+      border: 6px solid red;
+      padding: 5px;
+      text-align: center;
+    }
+    body {
+      background-color: bisque;
+      font-size: small;
+    }
+  </style>
+</head>
+<body>
+  <h2>九九表(インド式)</h2>
+  <a href="./anzan.html">練習問題サイト</a>
+  <div id="multiplication-table"></div>
+
+  <script>
+    const table = document.createElement("table");
+
+    for (let i = 0; i <= 20; i++) {
+      const tr = document.createElement("tr");
+      for (let j = 0; j <= 20; j++) {
+        const td = document.createElement("td");
+        td.textContent = `${i} × ${j} = ${i * j}`;
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+
+    document.getElementById("multiplication-table").appendChild(table);
+  </script>
+  <a href="https://www.seiki.co.jp/tam/tamlog/india-mathematics/">デカい数の計算方法サイト</a>
+  </body>
+</html>
